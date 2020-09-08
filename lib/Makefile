@@ -28,8 +28,10 @@ obj-y += charset.o
 endif
 endif
 obj-$(CONFIG_USB_TTY) += circbuf.o
+ifndef CONFIG_HISI_MC
 obj-y += crc7.o
 obj-y += crc8.o
+endif
 obj-y += crc16.o
 obj-$(CONFIG_ERRNO_STR) += errno_str.o
 obj-$(CONFIG_FIT) += fdtdec_common.o
@@ -38,7 +40,9 @@ obj-$(CONFIG_GZIP_COMPRESSED) += gzip.o
 obj-$(CONFIG_GENERATE_SMBIOS_TABLE) += smbios.o
 obj-$(CONFIG_IMAGE_SPARSE) += image-sparse.o
 obj-y += ldiv.o
+ifndef CONFIG_HISI_MC
 obj-$(CONFIG_MD5) += md5.o
+endif
 obj-$(CONFIG_XXHASH) += xxhash.o
 obj-y += net_utils.o
 obj-$(CONFIG_PHYSMEM) += physmem.o
@@ -48,7 +52,7 @@ obj-$(CONFIG_RBTREE)	+= rbtree.o
 obj-$(CONFIG_BITREVERSE) += bitrev.o
 obj-y += list_sort.o
 endif
-
+obj-$(CONFIG_HWDEC) += hw_dec/
 obj-$(CONFIG_$(SPL_TPL_)TPM) += tpm-common.o
 ifeq ($(CONFIG_$(SPL_TPL_)TPM),y)
 obj-y += crc8.o
@@ -57,8 +61,10 @@ obj-$(CONFIG_TPM_V2) += tpm-v2.o
 endif
 
 obj-$(CONFIG_RSA) += rsa/
+ifndef CONFIG_HISI_MC
 obj-$(CONFIG_SHA1) += sha1.o
 obj-$(CONFIG_SHA256) += sha256.o
+endif
 
 obj-$(CONFIG_$(SPL_)ZLIB) += zlib/
 obj-$(CONFIG_$(SPL_)ZSTD) += zstd/
@@ -118,7 +124,7 @@ else
 # Main U-Boot always uses the full printf support
 obj-y += vsprintf.o strto.o
 endif
-
+obj-$(CONFIG_CMD_NAND) +=match_table.o
 obj-y += date.o
 
 #

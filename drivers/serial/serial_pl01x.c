@@ -19,6 +19,7 @@
 #include <dm/platform_data/serial_pl01x.h>
 #include <linux/compiler.h>
 #include "serial_pl01x_internal.h"
+#include <usb.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -269,6 +270,17 @@ __weak struct serial_device *default_serial_console(void)
 }
 
 #endif /* nCONFIG_DM_SERIAL */
+
+void serial_puts_to_hitool(const char *s)
+{
+#ifndef CONFIG_MINI_BOOT
+	udc_puts(s);
+#endif
+	while (*s) {
+		while (pl01x_putc(base_regs, *s) == -EAGAIN);
+		s++;
+	}
+}
 
 #ifdef CONFIG_DM_SERIAL
 

@@ -706,7 +706,13 @@ config MMC_MTK
 	  If you have a machine with a integrated SD/MMC card reader, say Y or M here.
 	  This is needed if support for any SD/SDIO/MMC devices is required.
 	  If unsure, say N.
-
+  
+config HIMCI
+	bool "Hisilicon MMC controller for Hi35xx support"
+	depends on MMC
+	help
+	  Support for Hisilicon MMC host controller on Hi35xx ARM SoCs platform
+  
 endif
 
 config FSL_ESDHC

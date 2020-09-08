@@ -19,6 +19,7 @@
 #include <exports.h>
 #include <env_internal.h>
 #include <watchdog.h>
+#include <serial.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -781,6 +782,7 @@ int console_init_f(void)
 
 void stdio_print_current_devices(void)
 {
+#ifndef CONFIG_MINI_BOOT
 	/* Print information */
 	puts("In:    ");
 	if (stdio_devices[stdin] == NULL) {
@@ -802,6 +804,7 @@ void stdio_print_current_devices(void)
 	} else {
 		printf ("%s\n", stdio_devices[stderr]->name);
 	}
+#endif
 }
 
 #if CONFIG_IS_ENABLED(SYS_CONSOLE_IS_IN_ENV)
@@ -985,6 +988,23 @@ int console_init_r(void)
 #endif
 	print_pre_console_buffer(flushpoint);
 	return 0;
+}
+
+void print_to_hitool(const char *fmt, ...)
+{
+	va_list args;
+	char printbuffer[CONFIG_SYS_PBSIZE];
+
+	va_start(args, fmt);
+
+	/* For this to work, printbuffer must be larger than
+	 * anything we ever want to print.
+	 */
+	vsprintf(printbuffer, fmt, args);
+	va_end(args);
+
+	/* Print the string */
+	serial_puts_to_hitool(printbuffer);
 }
 
 #endif /* CONFIG_IS_ENABLED(SYS_CONSOLE_IS_IN_ENV) */

@@ -68,7 +68,11 @@ config STATIC_RELA
 config DMA_ADDR_T_64BIT
 	bool
 	default y if ARM64
-
+	
+config MINI_BOOT
+        bool "Enable hisi minit uboot"
+	default n
+	
 config HAS_VBAR
 	bool
 
@@ -1228,7 +1232,152 @@ config TARGET_HIKEY
 	  help
 	  Support for HiKey 96boards platform. It features a HI6220
 	  SoC, with 8xA53 CPU, mali450 gpu, and 1GB RAM.
+	  
+config TARGET_HI3559AV100
+	bool "Support Hi3559av100"
+	select ARM64
+	select DM
+	  help
+	  Support for Hisilicon Hi3559av100 platform.
 
+config TARGET_HI3569V100
+	bool "Support Hi3569v100"
+	select ARM64
+	select DM
+	  help
+	  Support for Hisilicon Hi3569v100 platform.
+
+config TARGET_HI3531DV200
+	bool "Support Hi3531DV200"
+	select ARM64
+	  help
+	  Support for Hisilicon Hi3531DV200 platform.
+	  
+config TARGET_HI3535AV100
+	bool "Support Hi3535AV100"
+	select ARM64
+	  help
+	  Support for Hisilicon Hi3535AV100 platform.
+
+config TARGET_HI3556AV100
+	bool "Support Hi3556av100"
+	select CPU_V7A
+	select DM
+	  help
+	  Support for Hisilicon Hi3556AV100 platform.
+
+config TARGET_HI3519AV100
+	bool "Support Hi3519av100"
+	select CPU_V7A
+	select DM
+	  help
+	  Support for Hisilicon Hi3519AV100 platform.
+
+config TARGET_HI3556V200
+	bool "Support Hi3556v200"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3556V200 platform.
+
+config TARGET_HI3559V200
+	bool "Support Hi3559v200"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3559V200 platform.
+
+config TARGET_HI3516CV500
+	bool "Support Hi3516cv500"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3516CV500 platform.
+
+config TARGET_HI3516DV300
+	bool "Support Hi3516dv300"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3516DV300 platform.
+
+config TARGET_HI3516AV300
+	bool "Support Hi3516av300"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3516AV300 platform.
+config TARGET_HI3562V100
+	bool "Support Hi3562v100"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3562v100 platform.
+config TARGET_HI3566V100
+	bool "Support Hi3566v100"
+	select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+	  help
+	  Support for Hisilicon Hi3566v100 platform.
+
+config TARGET_HI3516EV200
+    bool "Support Hi3516EV200"
+    select CPU_V7A
+	select DM if !MINI_BOOT
+	select CPU_V7A_HAS_NONSEC if !MINI_BOOT
+    help
+    Support for Hisilicon Hi3516EV200 platform.
+
+config TARGET_HI3518EV300
+    bool "Support Hi3518EV300"
+    select CPU_V7A
+	select DM if !MINI_BOOT
+	select CPU_V7A_HAS_NONSEC if !MINI_BOOT
+    help
+    Support for Hisilicon Hi3518EV300 platform.
+ 
+config TARGET_HI3516DV200
+    bool "Support Hi3516DV200"
+    select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+    help
+    Support for Hisilicon Hi3516DV200 platform.
+
+config TARGET_HI3516EV300
+    bool "Support Hi3516EV300"
+    select CPU_V7A
+	select DM
+	select CPU_V7A_HAS_NONSEC
+    help
+    Support for Hisilicon Hi3516EV300 platform.
+
+config TARGET_HI3521DV200
+    bool "Support Hi3521DV200"
+    select CPU_V7A
+	select CPU_V7A_HAS_NONSEC
+    help
+    Support for Hisilicon Hi3521DV200 platform.
+
+config TARGET_HI3520DV500
+    bool "Support Hi3520DV500"
+    select CPU_V7A
+	select CPU_V7A_HAS_NONSEC
+    help
+    Support for Hisilicon Hi3520DV500 platform.
+
+config ARCH_HI35XX
+	bool "Hisilicon Hi35XX SoCs"
+	select DM
+
+	  
 config TARGET_HIKEY960
 	bool "Support HiKey960 96boards Consumer Edition Platform"
 	select ARM64
@@ -1690,6 +1839,8 @@ source "arch/arm/mach-exynos/Kconfig"
 
 source "arch/arm/mach-highbank/Kconfig"
 
+source "arch/arm/mach-hi35xx/Kconfig"
+
 source "arch/arm/mach-integrator/Kconfig"
 
 source "arch/arm/mach-k3/Kconfig"
@@ -1816,6 +1967,22 @@ source "board/freescale/s32v234evb/Kconfig"
 source "board/grinn/chiliboard/Kconfig"
 source "board/gumstix/pepper/Kconfig"
 source "board/hisilicon/hikey/Kconfig"
+source "board/hisilicon/hi3559av100/Kconfig"
+source "board/hisilicon/hi3531dv200/Kconfig"
+source "board/hisilicon/hi3535av100/Kconfig"
+source "board/hisilicon/hi3556av100/Kconfig"
+source "board/hisilicon/hi3519av100/Kconfig"
+source "board/hisilicon/hi3516dv300/Kconfig"
+source "board/hisilicon/hi3516av300/Kconfig"
+source "board/hisilicon/hi3516cv500/Kconfig"
+source "board/hisilicon/hi3516ev200/Kconfig"
+source "board/hisilicon/hi3516ev300/Kconfig"
+source "board/hisilicon/hi3518ev300/Kconfig"
+source "board/hisilicon/hi3516dv200/Kconfig"
+source "board/hisilicon/hi3521dv200/Kconfig"
+source "board/hisilicon/hi3520dv500/Kconfig"
+source "board/hisilicon/hi3531dv200/Kconfig"
+source "board/hisilicon/hi3535av100/Kconfig"
 source "board/hisilicon/hikey960/Kconfig"
 source "board/hisilicon/poplar/Kconfig"
 source "board/isee/igep003x/Kconfig"
@@ -1846,6 +2013,7 @@ endmenu
 config SPL_LDSCRIPT
 	default "arch/arm/cpu/arm926ejs/mxs/u-boot-spl.lds" if (ARCH_MX23 || ARCH_MX28) && !SPL_FRAMEWORK
 	default "arch/arm/cpu/arm1136/u-boot-spl.lds" if CPU_ARM1136
-	default "arch/arm/cpu/armv8/u-boot-spl.lds" if ARM64
+	default "arch/arm/cpu/armv8/u-boot-spl.lds" if ARM64 && !TARGET_HI3559AV100 && !TARGET_HI3531DV200 &&\
+			   !TARGET_HI3535AV100 && !TARGET_HI3569V100 
 
 

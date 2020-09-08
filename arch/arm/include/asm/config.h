@@ -5,7 +5,9 @@
 
 #ifndef _ASM_CONFIG_H_
 #define _ASM_CONFIG_H_
+#include <generated/autoconf.h>
 
+#ifndef CONFIG_MINI_BOOT
 #define CONFIG_LMB
 #define CONFIG_SYS_BOOT_RAMDISK_HIGH
 
@@ -16,5 +18,6 @@
 	defined(CONFIG_FSL_LAYERSCAPE)
 #include <asm/arch/config.h>
 #endif
+#endif /* CONFIG_MINI_BOOT */
 
 #endif

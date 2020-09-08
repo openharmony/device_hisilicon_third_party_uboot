@@ -89,6 +89,7 @@ obj-y += dfu/
 obj-$(CONFIG_PCH) += pch/
 obj-y += phy/allwinner/
 obj-y += phy/marvell/
+obj-y += phy/hibvt/
 obj-y += rtc/
 obj-y += scsi/
 obj-y += sound/
@@ -116,3 +117,4 @@ obj-$(CONFIG_W1_EEPROM) += w1-eeprom/
 obj-$(CONFIG_MACH_PIC32) += ddr/microchip/
 obj-$(CONFIG_DM_HWSPINLOCK) += hwspinlock/
 endif
+obj-$(CONFIG_DDR_TRAINING_V2) += ddr/hisilicon/default/

@@ -101,6 +101,14 @@ config HBMC_AM654
 	 This is the driver for HyperBus controller on TI's AM65x and
 	 other SoCs
 
+config HIFMC
+	bool "Enable HIFMC - Hisilicon Flash Memory Controller"
+	depends on TARGET_HI3516EV200 || TARGET_HI3516EV300 || TARGET_HI3518EV300 || TARGET_HI3516DV200 || TARGET_HI3559AV100 || TARGET_HI3569V100 || TARGET_HI3556AV100 || TARGET_HI3519AV100 || TARGET_HI3516CV500 || TARGET_HI3516DV300 || TARGET_HI3516AV300 || TARGET_HI3556V200 || TARGET_HI3559V200 || TARGET_HI3531DV200 || TARGET_HI3535AV100 || TARGET_HI3562V100 || TARGET_HI3566V100 || TARGET_HI3521DV200 || TARGET_HI3520DV500
+	help
+	  Hisilicon Flash Memory Controller support SPI Nor SPI Nand and parallel
+	  Nand Flash. often used on embedded chip. This option will provide the
+	  generic support for FMC drivers to register.
+	  
 source "drivers/mtd/nand/Kconfig"
 
 source "drivers/mtd/spi/Kconfig"

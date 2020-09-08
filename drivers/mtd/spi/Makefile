@@ -3,6 +3,10 @@
 # (C) Copyright 2006
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 
+obj-y = hisi_spi_nor.o
+
+obj-$(CONFIG_HIFMC_SPI_NOR) += hifmc100/
+
 obj-$(CONFIG_DM_SPI_FLASH) += sf-uclass.o
 spi-nor-y := sf_probe.o spi-nor-ids.o
 

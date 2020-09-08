@@ -17,6 +17,21 @@ mtd-$(CONFIG_ST_SMI) += st_smi.o
 mtd-$(CONFIG_STM32_FLASH) += stm32_flash.o
 mtd-$(CONFIG_RENESAS_RPC_HF) += renesas_rpc_hf.o
 mtd-$(CONFIG_HBMC_AM654) += hbmc-am654.o
+obj-$(CONFIG_HIFMC) += hifmc_common.o
+obj-$(CONFIG_TARGET_HI3559AV100) += hifmc_hi3559av100.o
+obj-$(CONFIG_TARGET_HI3556AV100) += hifmc_hi3556av100.o
+obj-$(CONFIG_TARGET_HI3519AV100) += hifmc_hi3519av100.o
+obj-$(CONFIG_TARGET_HI3516CV500) += hifmc_hi3516cv500.o
+obj-$(CONFIG_TARGET_HI3516DV300) += hifmc_hi3516dv300.o
+obj-$(CONFIG_TARGET_HI3516AV300) += hifmc_hi3516av300.o
+obj-$(CONFIG_TARGET_HI3516EV200) += hifmc_hi3516ev200.o
+obj-$(CONFIG_TARGET_HI3516EV300) += hifmc_hi3516ev300.o
+obj-$(CONFIG_TARGET_HI3518EV300) += hifmc_hi3518ev300.o
+obj-$(CONFIG_TARGET_HI3516DV200) += hifmc_hi3516dv200.o
+obj-$(CONFIG_TARGET_HI3531DV200) += hifmc_hi3531dv200.o
+obj-$(CONFIG_TARGET_HI3535AV100) += hifmc_hi3531dv200.o
+obj-$(CONFIG_TARGET_HI3521DV200) += hifmc_hi3521dv200.o
+obj-$(CONFIG_TARGET_HI3520DV500) += hifmc_hi3520dv500.o
 
 # U-Boot build
 ifeq ($(CONFIG_SPL_BUILD)$(CONFIG_TPL_BUILD),)

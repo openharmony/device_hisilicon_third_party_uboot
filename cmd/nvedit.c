@@ -52,6 +52,7 @@ DECLARE_GLOBAL_DATA_PTR;
 	defined(CONFIG_ENV_IS_IN_SATA)		|| \
 	defined(CONFIG_ENV_IS_IN_SPI_FLASH)	|| \
 	defined(CONFIG_ENV_IS_IN_REMOTE)	|| \
+	defined(CONFIG_ENV_IS_IN_UFS)		|| \
 	defined(CONFIG_ENV_IS_IN_UBI)
 
 #define ENV_IS_IN_DEVICE
@@ -61,7 +62,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #if	!defined(ENV_IS_IN_DEVICE)		&& \
 	!defined(CONFIG_ENV_IS_NOWHERE)
 # error Define one of CONFIG_ENV_IS_IN_{EEPROM|FLASH|MMC|FAT|EXT4|\
-NAND|NVRAM|ONENAND|SATA|SPI_FLASH|REMOTE|UBI} or CONFIG_ENV_IS_NOWHERE
+NAND|NVRAM|ONENAND|SATA|SPI_FLASH|REMOTE|UBI|UFS} or CONFIG_ENV_IS_NOWHERE
 #endif
 
 /*
@@ -807,6 +808,7 @@ int env_match(uchar *s1, int i2)
 }
 
 #ifndef CONFIG_SPL_BUILD
+#ifndef CONFIG_MINI_BOOT
 static int do_env_default(cmd_tbl_t *cmdtp, int flag,
 			  int argc, char * const argv[])
 {
@@ -879,6 +881,7 @@ static int do_env_delete(cmd_tbl_t *cmdtp, int flag,
 
 	return ret;
 }
+#endif /* CONFIG_MINI_BOOT */
 
 #ifdef CONFIG_CMD_EXPORTENV
 /*
@@ -1300,8 +1303,11 @@ static cmd_tbl_t cmd_env_sub[] = {
 #if defined(CONFIG_CMD_ASKENV)
 	U_BOOT_CMD_MKENT(ask, CONFIG_SYS_MAXARGS, 1, do_env_ask, "", ""),
 #endif
+
+#ifndef CONFIG_MINI_BOOT
 	U_BOOT_CMD_MKENT(default, 1, 0, do_env_default, "", ""),
 	U_BOOT_CMD_MKENT(delete, CONFIG_SYS_MAXARGS, 0, do_env_delete, "", ""),
+#endif /* CONFIG_MINI_BOOT */
 #if defined(CONFIG_CMD_EDITENV)
 	U_BOOT_CMD_MKENT(edit, 2, 0, do_env_edit, "", ""),
 #endif

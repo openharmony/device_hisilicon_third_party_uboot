@@ -7,8 +7,10 @@
 ifndef CONFIG_SPL_BUILD
 obj-y += init/
 obj-y += main.o
+ifndef CONFIG_MINI_BOOT
 obj-y += exports.o
 obj-$(CONFIG_HASH) += hash.o
+endif
 obj-$(CONFIG_HUSH_PARSER) += cli_hush.o
 obj-$(CONFIG_AUTOBOOT) += autoboot.o
 
@@ -135,3 +137,12 @@ obj-$(CONFIG_CMD_LOADB) += xyzModem.o
 obj-$(CONFIG_$(SPL_TPL_)YMODEM_SUPPORT) += xyzModem.o
 
 obj-$(CONFIG_AVB_VERIFY) += avb_verify.o
+ifndef CONFIG_HISI_DISABLE_DOWNLOAD
+obj-y += download_process.o
+endif
+obj-$(CONFIG_ARM64_SUPPORT_LOAD_FIP) += load_fip.o
+
+obj-$(CONFIG_CMD_CREAD) += cmd_cycle.o
+
+obj-$(CONFIG_CMD_CREAD) += cmd_ugzip.o
+

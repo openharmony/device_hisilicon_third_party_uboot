@@ -129,6 +129,7 @@ static int init_baud_rate(void)
 	return 0;
 }
 
+#ifndef CONFIG_MINI_BOOT
 static int display_text_info(void)
 {
 #if !defined(CONFIG_SANDBOX) && !defined(CONFIG_EFI_APP)
@@ -149,6 +150,8 @@ static int display_text_info(void)
 
 	return 0;
 }
+#endif /* CONFIG_MINI_BOOT */
+
 
 #ifdef CONFIG_SYSRESET
 static int print_resetinfo(void)
@@ -201,11 +204,13 @@ static int print_cpuinfo(void)
 }
 #endif
 
+#ifndef CONFIG_MINI_BOOT
 static int announce_dram_init(void)
 {
 	puts("DRAM:  ");
 	return 0;
 }
+#endif /* CONFIG_MINI_BOOT */
 
 static int show_dram_config(void)
 {
@@ -228,9 +233,9 @@ static int show_dram_config(void)
 	size = gd->ram_size;
 #endif
 
-	print_size(size, "");
+/*	print_size(size, "");
 	board_add_ram_info(0);
-	putc('\n');
+	putc('\n'); */
 
 	return 0;
 }
@@ -746,11 +751,12 @@ static int setup_reloc(void)
 #endif
 	memcpy(gd->new_gd, (char *)gd, sizeof(gd_t));
 
+#ifndef CONFIG_MINI_BOOT
 	debug("Relocation Offset is: %08lx\n", gd->reloc_off);
 	debug("Relocating to %08lx, new gd at %08lx, sp at %08lx\n",
 	      gd->relocaddr, (ulong)map_to_sysmem(gd->new_gd),
 	      gd->start_addr_sp);
-
+#endif
 	return 0;
 }
 
@@ -891,7 +897,9 @@ static const init_fnc_t init_sequence_f[] = {
 	get_clocks,		/* get CPU and bus clocks (etc.) */
 #endif
 #if !defined(CONFIG_M68K)
+#ifndef CONFIG_MINI_BOOT
 	timer_init,		/* initialize timer */
+#endif /* CONFIG_MINI_BOOT */
 #endif
 #if defined(CONFIG_BOARD_POSTCLK_INIT)
 	board_postclk_init,
@@ -900,8 +908,10 @@ static const init_fnc_t init_sequence_f[] = {
 	init_baud_rate,		/* initialze baudrate settings */
 	serial_init,		/* serial communications setup */
 	console_init_f,		/* stage 1 init of console */
+#ifndef CONFIG_MINI_BOOT
 	display_options,	/* say that we are here */
 	display_text_info,	/* show debugging info if required */
+#endif /* CONFIG_MINI_BOOT */
 #if defined(CONFIG_PPC) || defined(CONFIG_SH) || defined(CONFIG_X86)
 	checkcpu,
 #endif
@@ -909,7 +919,9 @@ static const init_fnc_t init_sequence_f[] = {
 	print_resetinfo,
 #endif
 #if defined(CONFIG_DISPLAY_CPUINFO)
+#ifndef CONFIG_MINI_BOOT
 	print_cpuinfo,		/* display cpu info (and speed) */
+#endif /* CONFIG_MINI_BOOT */
 #endif
 #if defined(CONFIG_DTB_RESELECT)
 	embedded_dtb_select,
@@ -921,28 +933,38 @@ static const init_fnc_t init_sequence_f[] = {
 #if defined(CONFIG_MISC_INIT_F)
 	misc_init_f,
 #endif
+#ifndef CONFIG_MINI_BOOT
 	INIT_FUNC_WATCHDOG_RESET
+#endif /* CONFIG_MINI_BOOT */
 #if defined(CONFIG_SYS_I2C)
 	init_func_i2c,
 #endif
 #if defined(CONFIG_VID) && !defined(CONFIG_SPL)
 	init_func_vid,
 #endif
+#ifndef CONFIG_MINI_BOOT
 	announce_dram_init,
+#endif /* CONFIG_MINI_BOOT */
 	dram_init,		/* configure available RAM banks */
 #ifdef CONFIG_POST
 	post_init_f,
 #endif
+#ifndef CONFIG_MINI_BOOT
 	INIT_FUNC_WATCHDOG_RESET
+#endif /* CONFIG_MINI_BOOT */
 #if defined(CONFIG_SYS_DRAM_TEST)
 	testdram,
 #endif /* CONFIG_SYS_DRAM_TEST */
+#ifndef CONFIG_MINI_BOOT
 	INIT_FUNC_WATCHDOG_RESET
+#endif /* CONFIG_MINI_BOOT */
 
 #ifdef CONFIG_POST
 	init_post,
 #endif
+#ifndef CONFIG_MINI_BOOT
 	INIT_FUNC_WATCHDOG_RESET
+#endif /* CONFIG_MINI_BOOT */
 	/*
 	 * Now that we have DRAM mapped and working, we can
 	 * relocate the code and continue running from DRAM.
@@ -1016,7 +1038,6 @@ void board_init_f(ulong boot_flags)
 
 	if (initcall_run_list(init_sequence_f))
 		hang();
-
 #if !defined(CONFIG_ARM) && !defined(CONFIG_SANDBOX) && \
 		!defined(CONFIG_EFI_APP) && !CONFIG_IS_ENABLED(X86_64) && \
 		!defined(CONFIG_ARC)

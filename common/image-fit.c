@@ -1143,16 +1143,31 @@ int calculate_hash(const void *data, int data_len, const char *algo,
 		*((uint32_t *)value) = cpu_to_uimage(*((uint32_t *)value));
 		*value_len = 4;
 	} else if (IMAGE_ENABLE_SHA1 && strcmp(algo, "sha1") == 0) {
+#ifdef CONFIG_SHA1
 		sha1_csum_wd((unsigned char *)data, data_len,
-			     (unsigned char *)value, CHUNKSZ_SHA1);
+				(unsigned char *)value, CHUNKSZ_SHA1);
 		*value_len = 20;
+#else
+		debug("Unsupported hash sha1 alogrithm\n");
+		return -1;
+#endif
 	} else if (IMAGE_ENABLE_SHA256 && strcmp(algo, "sha256") == 0) {
+#ifdef CONFIG_SHA256
 		sha256_csum_wd((unsigned char *)data, data_len,
 			       (unsigned char *)value, CHUNKSZ_SHA256);
 		*value_len = SHA256_SUM_LEN;
+#else
+		debug("Unsupported hash sha256 alogrithm\n");
+		return -1;
+#endif
 	} else if (IMAGE_ENABLE_MD5 && strcmp(algo, "md5") == 0) {
+#ifdef CONFIG_MD5
 		md5_wd((unsigned char *)data, data_len, value, CHUNKSZ_MD5);
 		*value_len = 16;
+#else
+		debug("Unsupported hash mad5 alogrithm\n");
+		return -1;
+#endif
 	} else {
 		debug("Unsupported hash alogrithm\n");
 		return -1;

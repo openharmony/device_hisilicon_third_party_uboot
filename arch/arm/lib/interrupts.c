@@ -47,8 +47,10 @@ int disable_interrupts(void)
 
 void bad_mode (void)
 {
+#ifndef CONFIG_MINI_BOOT
 	panic ("Resetting CPU ...\n");
 	reset_cpu (0);
+#endif /* CONFIG_MINI_BOOT */
 }
 
 static void show_efi_loaded_images(struct pt_regs *regs)
@@ -82,6 +84,7 @@ static void dump_instr(struct pt_regs *regs)
 
 void show_regs (struct pt_regs *regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	unsigned long __maybe_unused flags;
 	const char __maybe_unused *processor_modes[] = {
 	"USER_26",	"FIQ_26",	"IRQ_26",	"SVC_26",
@@ -121,6 +124,7 @@ void show_regs (struct pt_regs *regs)
 		processor_modes[processor_mode (regs)],
 		thumb_mode (regs) ? " (T)" : "");
 	dump_instr(regs);
+#endif /* CONFIG_MINI_BOOT */
 }
 
 /* fixup PC to point to the instruction leading to the exception */
@@ -132,70 +136,84 @@ static inline void fixup_pc(struct pt_regs *regs, int offset)
 
 void do_undefined_instruction (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("undefined instruction\n");
 	fixup_pc(pt_regs, -4);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }
 
 void do_software_interrupt (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("software interrupt\n");
 	fixup_pc(pt_regs, -4);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }
 
 void do_prefetch_abort (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("prefetch abort\n");
 	fixup_pc(pt_regs, -8);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }
 
 void do_data_abort (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("data abort\n");
 	fixup_pc(pt_regs, -8);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }
 
 void do_not_used (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("not used\n");
 	fixup_pc(pt_regs, -8);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }
 
 void do_fiq (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("fast interrupt request\n");
 	fixup_pc(pt_regs, -8);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }
 
 void do_irq (struct pt_regs *pt_regs)
 {
+#ifndef CONFIG_MINI_BOOT
 	efi_restore_gd();
 	printf ("interrupt request\n");
 	fixup_pc(pt_regs, -8);
 	show_regs (pt_regs);
 	show_efi_loaded_images(pt_regs);
 	bad_mode ();
+#endif /* CONFIG_MINI_BOOT */
 }

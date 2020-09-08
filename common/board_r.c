@@ -59,6 +59,11 @@
 #include <asm/gpio.h>
 #endif
 
+#ifdef CONFIG_CMD_SF
+#include <spi_flash.h>
+#include <ufs.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
@@ -77,6 +82,7 @@ __weak void cpu_secondary_init_r(void)
 {
 }
 
+#ifndef CONFIG_MINI_BOOT
 static int initr_secondary_cpu(void)
 {
 	/*
@@ -90,6 +96,7 @@ static int initr_secondary_cpu(void)
 
 	return 0;
 }
+#endif  /* CONFIG_MINI_BOOT */
 
 static int initr_trace(void)
 {
@@ -102,9 +109,10 @@ static int initr_trace(void)
 
 static int initr_reloc(void)
 {
+#ifndef CONFIG_MINI_BOOT
 	/* tell others: relocation done */
 	gd->flags |= GD_FLG_RELOC | GD_FLG_FULL_MALLOC_INIT;
-
+#endif  /* CONFIG_MINI_BOOT */
 	return 0;
 }
 
@@ -399,6 +407,31 @@ static int initr_flash(void)
 }
 #endif
 
+#ifdef CONFIG_CMD_SF
+
+#ifndef CONFIG_ENV_SPI_BUS
+# define CONFIG_ENV_SPI_BUS 0
+#endif
+#ifndef CONFIG_ENV_SPI_CS
+# define CONFIG_ENV_SPI_CS  0
+#endif
+#ifndef CONFIG_ENV_SPI_MAX_HZ
+# define CONFIG_ENV_SPI_MAX_HZ  1000000
+#endif
+#ifndef CONFIG_ENV_SPI_MODE
+# define CONFIG_ENV_SPI_MODE    SPI_MODE_3
+#endif
+
+/* go init the SPI Nor */
+static int initr_snor(void)
+{
+	puts("SPI Nor:  ");
+	spi_flash_probe(CONFIG_ENV_SPI_BUS, CONFIG_ENV_SPI_CS,
+			CONFIG_ENV_SPI_MAX_HZ, CONFIG_ENV_SPI_MODE);
+	return 0;
+}
+#endif /* CONFIG_CMD_SF */
+
 #ifdef CONFIG_CMD_NAND
 /* go init the NAND */
 static int initr_nand(void)
@@ -406,6 +439,15 @@ static int initr_nand(void)
 	puts("NAND:  ");
 	nand_init();
 	printf("%lu MiB\n", nand_size() / 1024);
+	return 0;
+}
+#endif
+
+#ifdef CONFIG_GENERIC_UFS
+static int initr_ufs(void)
+{
+	puts("UFS:   ");
+	ufs_storage_init();
 	return 0;
 }
 #endif
@@ -429,6 +471,7 @@ static int initr_mmc(void)
 }
 #endif
 
+#ifndef CONFIG_MINI_BOOT
 /*
  * Tell if it's OK to load the environment early in boot.
  *
@@ -468,7 +511,7 @@ static int initr_env(void)
 
 	return 0;
 }
-
+#endif /* CONFIG_MINI_BOOT */
 #ifdef CONFIG_SYS_BOOTPARAMS_LEN
 static int initr_malloc_bootparams(void)
 {
@@ -481,11 +524,13 @@ static int initr_malloc_bootparams(void)
 }
 #endif
 
+#ifndef CONFIG_MINI_BOOT
 static int initr_jumptable(void)
 {
 	jumptable_init();
 	return 0;
 }
+#endif /* CONFIG_MINI_BOOT */
 
 #if defined(CONFIG_API)
 static int initr_api(void)
@@ -496,6 +541,7 @@ static int initr_api(void)
 }
 #endif
 
+#ifndef CONFIG_MINI_BOOT
 /* enable exceptions */
 #ifdef CONFIG_ARM
 static int initr_enable_interrupts(void)
@@ -504,6 +550,7 @@ static int initr_enable_interrupts(void)
 	return 0;
 }
 #endif
+#endif /* CONFIG_MINI_BOOT */
 
 #ifdef CONFIG_CMD_NET
 static int initr_ethaddr(void)
@@ -633,6 +680,14 @@ static int initr_bedbug(void)
 }
 #endif
 
+static int initr_download(void)
+{
+#ifndef CONFIG_HISI_DISABLE_DOWNLOAD
+	extern void download_boot(const int (*handle)(void));
+	download_boot(NULL);
+#endif
+	return 0;
+}
 static int run_main_loop(void)
 {
 #ifdef CONFIG_SANDBOX
@@ -644,6 +699,9 @@ static int run_main_loop(void)
 	return 0;
 }
 
+#ifdef CONFIG_MINI_BOOT
+	extern int apps_startup(void);
+#endif
 /*
  * We hope to remove most of the driver-related init and do it if/when
  * the driver is later used.
@@ -740,6 +798,9 @@ static init_fnc_t init_sequence_r[] = {
 	/* initialize higher level parts of CPU like time base and timers */
 	cpu_init_r,
 #endif
+#ifdef CONFIG_CMD_SF
+	initr_snor,
+#endif 
 #ifdef CONFIG_CMD_NAND
 	initr_nand,
 #endif
@@ -749,12 +810,19 @@ static init_fnc_t init_sequence_r[] = {
 #ifdef CONFIG_MMC
 	initr_mmc,
 #endif
+#ifdef CONFIG_GENERIC_UFS
+	initr_ufs,
+#endif
+#ifndef CONFIG_MINI_BOOT
 	initr_env,
+#endif 
 #ifdef CONFIG_SYS_BOOTPARAMS_LEN
 	initr_malloc_bootparams,
 #endif
 	INIT_FUNC_WATCHDOG_RESET
+#ifndef CONFIG_MINI_BOOT
 	initr_secondary_cpu,
+#endif 
 #if defined(CONFIG_ID_EEPROM) || defined(CONFIG_SYS_I2C_MAC_OFFSET)
 	mac_read_from_eeprom,
 #endif
@@ -766,7 +834,9 @@ static init_fnc_t init_sequence_r[] = {
 	initr_pci,
 #endif
 	stdio_add_devices,
+#ifndef CONFIG_MINI_BOOT
 	initr_jumptable,
+#endif 
 #ifdef CONFIG_API
 	initr_api,
 #endif
@@ -785,9 +855,13 @@ static init_fnc_t init_sequence_r[] = {
 #ifdef CONFIG_CMD_KGDB
 	initr_kgdb,
 #endif
+#ifndef CONFIG_MINI_BOOT
 	interrupt_init,
+#endif
 #ifdef CONFIG_ARM
+#ifndef CONFIG_MINI_BOOT
 	initr_enable_interrupts,
+#endif
 #endif
 #if defined(CONFIG_MICROBLAZE) || defined(CONFIG_M68K)
 	timer_init,		/* initialize timer */
@@ -838,6 +912,12 @@ static init_fnc_t init_sequence_r[] = {
 #if defined(CONFIG_PRAM)
 	initr_mem,
 #endif
+	initr_download,
+	
+#ifdef CONFIG_MINI_BOOT
+	//apps_startup,
+#endif
+
 	run_main_loop,
 };
 
