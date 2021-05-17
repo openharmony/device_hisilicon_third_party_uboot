@@ -402,7 +402,7 @@ struct mmc *MmcBlkDevInit(int dev)
     return mmcDev;
 }
 
-static int MmcBlkRead(struct mmc *mmcDev, void *buffer, u32 blk, u32 cnt)
+static int MmcBlkRead(const struct mmc *mmcDev, char *buffer, u32 blk, u32 cnt)
 {
     ulong start = (ulong)buffer;
 
@@ -418,7 +418,7 @@ static int MmcBlkRead(struct mmc *mmcDev, void *buffer, u32 blk, u32 cnt)
 }
 
 #define NUM_BASE 10
-int BlkDevRead(void *buffer, u32 blk, u32 cnt)
+int BlkDevRead(char *buffer, u32 blk, u32 cnt)
 {
     if (!mmc) {
         int devNo = env_get_ulong("mmcdev", NUM_BASE, 0);
@@ -442,30 +442,29 @@ char g_bootArgsStr[ARG_SZ];
 static void ChangeBootArgs()            // get bootargs from emmc
 {
     char *emmcBootArgs = env_get("bootargs");
-    if(!emmcBootArgs) {
+    if (!emmcBootArgs) {
         printf("@@@ bootArgs from emmc is bad = NULL\n");
         return;
     }
     int emmcBootArgsLen = strlen(emmcBootArgs);
-    if(emmcBootArgsLen < MIN_BOOTARGS_LENGTH) {
+    if (emmcBootArgsLen < MIN_BOOTARGS_LENGTH) {
         printf("@@@ bootArgs from emmc is bad = %s, len=%d\n", emmcBootArgs, emmcBootArgsLen);
         return;
     }
     char *initIndex = strstr(emmcBootArgs, "init");
     char *blkIndex = strstr(emmcBootArgs, "blkdevparts");
-    if(!initIndex || !blkIndex) {       // error
+    if (!initIndex || !blkIndex) {       // error
         printf("@@@ bootArgs from emmc is bad = %s\n", emmcBootArgs);
         return;
     }
 
-    if(!g_isRecovery) {                 // hos
+    if (!g_isRecovery) {                 // hos
         memset(g_bootArgsStr, 0, ARG_SZ);
         memcpy(g_bootArgsStr, emmcBootArgs, emmcBootArgsLen);
         printf("@@@ bootArgs final from emmc = %s\n", g_bootArgsStr);
     } else {
         printf("@@@ bootArgs final from misc = %s\n", g_bootArgsStr);
     }
-
 }
 
 static int EmmcInitParam()              // get "boot_updater" string in misc,then set env
@@ -492,8 +491,8 @@ static int EmmcInitParam()              // get "boot_updater" string in misc,the
     struct UpdateMessage *p = (struct UpdateMessage *)block2;
     block2[MAX_COMMAND_SIZE - 1] = block2[MAX_COMMAND_SIZE + MAX_UPDATE_SIZE - 1] =
         block2[EMMC_SECTOR_SIZE * EMMC_SECTOR_CNT - 1] = 0;
-    p->command[0] = p->command[0] == (char)-1 ? 0 : p->command[0];
-    p->update[0] = p->update[0] == (char)-1 ? 0 : p->update[0];
+    p->command[0] = p->command[0] == ((char)-1) ? 0 : p->command[0];
+    p->update[0] = p->update[0] == ((char)-1) ? 0 : p->update[0];
     block2[EMMC_SECTOR_SIZE * (EMMC_SECTOR_CNT - 1)] = block2[EMMC_SECTOR_SIZE * (EMMC_SECTOR_CNT - 1)] ==
         (char)-1 ? 0 : block2[EMMC_SECTOR_SIZE * (EMMC_SECTOR_CNT - 1)];
 
@@ -512,7 +511,7 @@ static int EmmcInitParam()              // get "boot_updater" string in misc,the
         } else {
             memcpy(g_bootArgsStr, rebootHead, strlen(rebootHead) + 1);
         }
-        memcpy(g_bootArgsStr+strlen(g_bootArgsStr), &block2[EMMC_SECTOR_SIZE*(EMMC_SECTOR_CNT - 1)], partStrLen + 1);
+        memcpy(g_bootArgsStr + strlen(g_bootArgsStr), &block2[EMMC_SECTOR_SIZE * (EMMC_SECTOR_CNT - 1)], partStrLen + 1);
     }
     printf("@@@ g_isRecovery = %d\n", g_isRecovery);
     printf("@@@ bootArgs from misc       = %s\n", g_bootArgsStr);
