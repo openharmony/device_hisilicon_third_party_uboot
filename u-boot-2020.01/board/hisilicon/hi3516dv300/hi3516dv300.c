@@ -511,7 +511,8 @@ static int EmmcInitParam()              // get "boot_updater" string in misc,the
         } else {
             memcpy(g_bootArgsStr, rebootHead, strlen(rebootHead) + 1);
         }
-        memcpy(g_bootArgsStr + strlen(g_bootArgsStr), &block2[EMMC_SECTOR_SIZE * (EMMC_SECTOR_CNT - 1)], partStrLen + 1);
+        memcpy(g_bootArgsStr + strlen(g_bootArgsStr), &block2[EMMC_SECTOR_SIZE * (EMMC_SECTOR_CNT - 1)],
+            partStrLen + 1);
     }
     printf("@@@ g_isRecovery = %d\n", g_isRecovery);
     printf("@@@ bootArgs from misc       = %s\n", g_bootArgsStr);
