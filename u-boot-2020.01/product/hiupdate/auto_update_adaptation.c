@@ -1029,7 +1029,7 @@ static void set_update_status(int status)
         return;
     }
     printf("pre - data.update_status %d\n", data.update_status);
-    data.updata_status = status;
+    data.update_status = status;
     loff_t size;
     int ret = file_fat_write(path, (void *)&data, 0, len, &size);
     if (ret < 0) {
