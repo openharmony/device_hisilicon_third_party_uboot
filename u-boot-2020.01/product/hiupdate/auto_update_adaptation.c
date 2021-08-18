@@ -1019,7 +1019,7 @@ typedef struct {
 
 static void set_update_status(int status)
 {
-    printf("\nset_update_status status:%d\n",status);
+    printf("\nset update status:%d\n", status);
     const char *path = "/update/metadata";
     UpdateMetaData data = {0};
     int len = sizeof(data);
@@ -1067,7 +1067,7 @@ static int update_to_flash(void)
 	int cnt;
 	int uboot_updated = 0;
 	char buf[NAME_MAX_LEN] = {0};
-	int update_status = 1;
+    int update_status = 1;
 
 #ifdef CONFIG_AUTO_OTA_UPDATE
 	if (g_is_ota) {
@@ -1162,7 +1162,7 @@ static int update_to_flash(void)
 		} while (res < 0);
 	}
 	
-	set_update_status(update_status);
+    set_update_status(update_status);
 
 	if (uboot_updated == 1) {
         printf("update success!\n");
