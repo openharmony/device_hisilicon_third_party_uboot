@@ -519,7 +519,7 @@ static int EmmcInitParam()              // get "boot_updater" string in misc,the
 
 int misc_init_r(void)
 {
-    const char cmdBuf[] = "mmc read 0x0 0x80000000 0x800 0x4800; go 0x80000000";
+    const char cmdBuf[] = "mmc read 0x0 0x80000000 0x800 0x4800; bootm 0x80000000";
 
 #ifdef CONFIG_RANDOM_ETHADDR
 	random_init_r();
