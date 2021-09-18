@@ -1142,7 +1142,7 @@ static int update_to_flash(void)
 #ifdef CONFIG_AUTO_OTA_UPDATE
             if (res) {
                 // record update status as failed
-                update_status = 0;
+                g_update_status = 0;
             }
 			if (g_is_ota)
 				break;
