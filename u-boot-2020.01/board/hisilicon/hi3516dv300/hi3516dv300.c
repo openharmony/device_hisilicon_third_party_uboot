@@ -444,7 +444,7 @@ static int g_isRecovery = 0;
 
 char g_bootArgsStr[ARG_SZ];
 
-static void ChangeBootArgs()            // get bootargs from emmc
+static void ChangeBootArgs(void)            // get bootargs from emmc
 {
     char *emmcBootArgs = env_get("bootargs");
     if (!emmcBootArgs) {
@@ -465,7 +465,7 @@ static void ChangeBootArgs()            // get bootargs from emmc
     }
 }
 
-static int EmmcInitParam()              // get "boot_updater" string in misc,then set env
+static int EmmcInitParam(void)              // get "boot_updater" string in misc,then set env
 {
     const char rebootHead[] = "mem=640M console=ttyAMA0,115200 mmz=anonymous,0,0xA8000000,384M "
         "clk_ignore_unused androidboot.selinux=permissive skip_initramfs rootdelay=10 init=/init "
@@ -517,6 +517,128 @@ static int EmmcInitParam()              // get "boot_updater" string in misc,the
     return g_isRecovery;
 }
 
+/* where to load files into memory */
+#define LOAD_ADDR ((unsigned char *)0x83000000)
+
+#define OTA_MAX_COMPONENT_NUM 8
+#define READ_BUF_LEN 4096
+#define OTA_PATH_LEN 64
+#define OTA_IMG_PATH "/update/version"
+#define OTA_USE_PATH "/update"
+
+
+const char *g_imgList[OTA_MAX_COMPONENT_NUM] = { "OTA.tag",    "config",          "u-boot.bin", "kernel.bin",
+                                                 "rootfs.img", "rootfs_ext4.img", "patch.img",  "infocomp.bin" };
+
+int get_img_path(int idx, int verIdx, char *path, unsigned int len)
+{
+    if (path == NULL) {
+        return -1;
+    }
+
+    char tmpPath[OTA_PATH_LEN] = {0};
+    if (sprintf(tmpPath, "%s%d/%s", OTA_IMG_PATH, verIdx, g_imgList[idx]) <= 0) {
+        printf("sprintf ver:%d imgPath:%s fail!\r\n", verIdx, g_imgList[idx]);
+        return -1;
+    }
+    if (!strcpy(path, tmpPath)) {
+        printf("strcpy ver:%d imgPath:%s fail!\r\n", verIdx, g_imgList[idx]);
+        return -1;
+    }
+
+    return 0;
+}
+
+int get_write_path(int idx, char *path, unsigned int len)
+{
+    if (path == NULL) {
+        return -1;
+    }
+
+    char tmpPath[OTA_PATH_LEN] = {0};
+    if (sprintf(tmpPath, "%s/%s", OTA_USE_PATH, g_imgList[idx]) <= 0) {
+        printf("sprintf use path %s fail!\r\n", g_imgList[idx]);
+        return -1;
+    }
+    if (!strcpy(path, tmpPath)) {
+        printf("strcpy use path %s fail!\r\n", g_imgList[idx]);
+        return -1;
+    }
+
+    return 0;
+}
+
+int move_to_ota_path(int verIdx)
+{
+    unsigned long aufile_size = 0;
+    for (int idx = 0; idx < OTA_MAX_COMPONENT_NUM; idx++) {
+        char imgPath[OTA_PATH_LEN] = {0};
+        int ret = get_img_path(idx, verIdx, imgPath, sizeof(imgPath));
+        if (ret != 0 || (!fat_exists(imgPath))) {
+            continue;
+        }
+
+        long long imgSize = 0;
+        if (!fat_size(imgPath, &imgSize)) {
+            aufile_size = ALIGN((unsigned long)imgSize, CONFIG_SYS_CACHELINE_SIZE);
+            memset(LOAD_ADDR, 0xff, aufile_size);
+        } else {
+            printf("get %s fat_size error\n", imgPath);
+            return -1;
+        }
+
+        char writePath[OTA_PATH_LEN] = {0};
+        ret = get_write_path(idx, writePath, sizeof(writePath));
+        if (ret != 0) {
+            printf("get write path error, verIdx:%d, imgIdx:%d\n", verIdx, idx);
+            return -1;
+        }
+
+        long long sz = file_fat_read(imgPath, LOAD_ADDR, (unsigned long)imgSize);
+        if (sz <= 0) {
+            printf("%s fat_read error\n", imgPath);
+            return -1;
+        }
+
+        long long writeLen = 0;
+        ret = file_fat_write(writePath, (void *)LOAD_ADDR, 0, sz, &writeLen);
+        if (ret < 0) {
+            printf("write data to %s error\n", writePath);
+            return -1;
+        }
+
+        (void)fat_unlink(imgPath);
+    }
+    return 0;
+}
+
+int do_ota_auto_update(void)
+{
+    int updateFlag = -1;
+    int verIdx = 1;
+    int tagIdx = 0;
+    while (1) {
+        // Check whether OTA.tag is valid.
+        char tagPath[OTA_PATH_LEN] = {0};
+        int ret = get_img_path(tagIdx, verIdx, tagPath, sizeof(tagPath));
+        if (ret != 0 || (!fat_exists(tagPath))) {
+            printf("get verIdx:%d OTA.tag path fail, or file not exist.\r\n", verIdx);
+            break;
+        }
+
+        ret = move_to_ota_path(verIdx);
+        if (ret != 0) {
+            printf("move_to_ota_path version:%d faild\n", verIdx);
+            return ret;
+        }
+        updateFlag = do_auto_update();
+        printf("version:%d update ret %d\n", verIdx, updateFlag);
+
+        verIdx++;
+    }
+    return updateFlag;
+}
+
 int misc_init_r(void)
 {
     const char cmdBuf[] = "mmc read 0x0 0x80000000 0x800 0x4800; bootm 0x80000000";
@@ -560,7 +682,7 @@ int misc_init_r(void)
 #if (CONFIG_AUTO_UPDATE == 1)
     int update_flag = -1;
     if (auto_update_flag)
-        update_flag = do_auto_update();
+        update_flag = do_ota_auto_update();
     if (bare_chip_program && !auto_update_flag)
         save_bootdata_to_flash();
     if (update_flag == 0)
