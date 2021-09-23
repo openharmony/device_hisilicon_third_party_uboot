@@ -1044,6 +1044,8 @@ static void set_update_status(int status)
 }
 #endif
 
+int g_update_status = -1;
+
 /*
  * If none of the update file(u-boot, kernel or rootfs) was found
  * in the medium, return -1;
@@ -1059,7 +1061,6 @@ static int update_to_flash(void)
 	int cnt;
 	int uboot_updated = 0;
 	char buf[NAME_MAX_LEN] = {0};
-	int update_status = 1;
 
 #ifdef CONFIG_AUTO_OTA_UPDATE
 	if (g_is_ota) {
@@ -1131,6 +1132,9 @@ static int update_to_flash(void)
 		/* customer wants. */
 		cnt = 0;
 		do {
+			if (g_update_status != 0) {
+				g_update_status = 1;
+			}
 			res = au_do_update(i, (unsigned long)sz);
             if (!res) {
                 printf("%s write success!\n", aufile[i]);
@@ -1138,7 +1142,7 @@ static int update_to_flash(void)
 #ifdef CONFIG_AUTO_OTA_UPDATE
             if (res) {
                 // record update status as failed
-                update_status = 0;
+                g_update_status = 0;
             }
 			if (g_is_ota)
 				break;
@@ -1154,6 +1158,7 @@ static int update_to_flash(void)
 		} while (res < 0);
 	}
 	
+	int update_status = (g_update_status == 1) ? 1 : 0;
 	set_update_status(update_status);
 
 	if (uboot_updated == 1) {

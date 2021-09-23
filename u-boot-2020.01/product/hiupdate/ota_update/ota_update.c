@@ -197,7 +197,7 @@ void clear_ota_files(void)
 	char path[OTA_PATH_LEN] = {0};
 	unsigned int i;
 
-	printf("\nupdate: clear unused file:");
+	printf("\nupdate: clear unused file:\n");
 	for (i = 0; i < g_component_num; i++) {
 		if (get_ota_file_path(
 			(char *)g_component_infos.table[i].addr,
