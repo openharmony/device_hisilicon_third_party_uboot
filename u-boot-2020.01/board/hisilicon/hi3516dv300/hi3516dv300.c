@@ -695,7 +695,7 @@ int misc_init_r(void)
         "clk_ignore_unused androidboot.selinux=permissive skip_initramfs rootdelay=10 hardware=Hi3516DV300 "
         "default_boot_device=soc/10100000.himci.eMMC init=/init "
         "root=/dev/ram0 blkdevparts=mmcblk0:1M(boot),15M(kernel),20M(updater),"
-        "2M(misc),4M(ramdisk),3303M(system),256M(vendor),-(userdata) initrd=0x84000000,0xA24000";
+        "2M(misc),4M(ramdisk),3303M(system),256M(vendor),50M(sys_prod),50M(chip_prod),-(userdata) initrd=0x84000000,0xA24000";
     const char bootcmd_with_ramdisk[] = "mmc read 0x0 0x80000000 0x800 0x4800; "
         "mmc read 0x0 0x84000000 0x13000 0x2000; "
         "bootm 0x80000000 0x84000000:0xA24000";
